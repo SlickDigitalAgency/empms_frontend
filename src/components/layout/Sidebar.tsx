@@ -1,10 +1,8 @@
-import { useState } from "react"
 import { NavLink, useLocation } from "react-router-dom"
 import { motion, AnimatePresence } from "framer-motion"
-import { X, GraduationCap, ChevronLeft, ChevronRight, Menu } from "lucide-react"
+import { X, GraduationCap, ChevronLeft, ChevronRight } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { navigationItems } from "@/constants/navigation"
-import { Button } from "@/components/ui/button"
 
 type SidebarProps = {
   open: boolean

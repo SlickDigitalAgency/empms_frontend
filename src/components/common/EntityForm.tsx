@@ -46,7 +46,7 @@ function inputType(field: FieldConfig) {
 }
 
 export function EntityForm({ definition, initialValue, references, submitting, onSubmit, onCancel }: EntityFormProps) {
-  const form = useForm<Record<string, string>>({
+  const form = useForm<Record<string, any>>({
     resolver: zodResolver(definition.schema),
     defaultValues: Object.fromEntries(definition.fields.map((field) => [field.name, String(initialValue?.[field.name] ?? "")])),
   })

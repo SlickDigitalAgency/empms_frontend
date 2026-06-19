@@ -81,7 +81,7 @@ export function StudentImport({ open, onClose, onSuccess }: StudentImportProps) 
     Papa.parse<ParsedRow>(selected, {
       header: true,
       skipEmptyLines: true,
-      complete(results) {
+      complete(results: Papa.ParseResult<ParsedRow>) {
         const normalized = results.data.map(normalizeHeaders)
         const errors: string[] = []
 
@@ -95,7 +95,7 @@ export function StudentImport({ open, onClose, onSuccess }: StudentImportProps) 
         }
 
         // Validate each row
-        normalized.forEach((row, i) => {
+        normalized.forEach((row: ParsedRow, i: number) => {
           const err = validateRow(row, i)
           if (err) errors.push(err)
         })
@@ -103,7 +103,7 @@ export function StudentImport({ open, onClose, onSuccess }: StudentImportProps) 
         setParseErrors(errors)
         setPreview(normalized.slice(0, 5)) // Show first 5 as preview
       },
-      error(error) {
+      error(error: Error) {
         setParseErrors([`Parse error: ${error.message}`])
       },
     })
@@ -118,7 +118,7 @@ export function StudentImport({ open, onClose, onSuccess }: StudentImportProps) 
     Papa.parse<ParsedRow>(file, {
       header: true,
       skipEmptyLines: true,
-      async complete(results) {
+      async complete(results: Papa.ParseResult<ParsedRow>) {
         try {
           const rows: EntityRecord[] = results.data.map(normalizeHeaders)
           const importResult = await api.importStudents(rows)

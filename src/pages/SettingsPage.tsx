@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react"
+import { useState } from "react"
 import { motion } from "framer-motion"
 import { Settings, CheckCircle, Loader2, AlertCircle, Link2, Plus, Edit, Trash2 } from "lucide-react"
 import { useForm } from "react-hook-form"
@@ -53,7 +53,7 @@ function ApiConfigTab() {
   function handleSave(values: ApiConfigForm) {
     localStorage.setItem(API_OVERRIDE_KEY, values.apiUrl)
     // Patch window so api.ts picks it up at runtime without reload
-    ;(window as Record<string, unknown>).__EMPMS_API_URL__ = values.apiUrl
+    ;(window as unknown as Record<string, unknown>).__EMPMS_API_URL__ = values.apiUrl
     toast({ title: "API URL Saved", description: "The new URL will be used for all requests." })
   }
 
