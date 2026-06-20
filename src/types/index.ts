@@ -47,7 +47,7 @@ export type FormField = {
   required?: boolean
   options?: Option[]
   optionsFrom?: EntityName
-  optionLabel?: string
+  optionLabel?: string | ((row: EntityRecord, references: ReferenceState) => string)
   grid?: "full" | "half"
 }
 
@@ -57,7 +57,7 @@ export type ColumnDef = {
   sortable?: boolean
   badge?: boolean
   relation?: EntityName
-  relationLabel?: string
+  relationLabel?: string | ((row: EntityRecord, references: ReferenceState) => string)
 }
 
 export type ModuleDefinition = {

@@ -39,16 +39,28 @@ const pageSize = 10
 function getOptions(field: FormField, references: ReferenceState): Option[] {
   if (field.options) return field.options
   if (!field.optionsFrom) return []
-  return (references[field.optionsFrom] ?? []).map((row) => ({
-    value: String(row.id ?? ""),
-    label: String(row[field.optionLabel ?? "id"] ?? row.id ?? "Untitled"),
-  }))
+  return (references[field.optionsFrom] ?? []).map((row) => {
+    let labelText = ""
+    if (typeof field.optionLabel === "function") {
+      labelText = field.optionLabel(row, references)
+    } else {
+      labelText = String(row[field.optionLabel ?? "id"] ?? row.id ?? "Untitled")
+    }
+    return {
+      value: String(row.id ?? ""),
+      label: labelText,
+    }
+  })
 }
 
 function resolveRelation(column: ColumnDef, value: unknown, references: ReferenceState) {
   if (!column.relation) return String(value ?? "")
   const match = (references[column.relation] ?? []).find((row) => String(row.id) === String(value))
-  return String(match?.[column.relationLabel ?? "id"] ?? value ?? "")
+  if (!match) return String(value ?? "")
+  if (typeof column.relationLabel === "function") {
+    return column.relationLabel(match, references)
+  }
+  return String(match[column.relationLabel ?? "id"] ?? value ?? "")
 }
 
 export function DataTable({

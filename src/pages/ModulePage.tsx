@@ -74,7 +74,14 @@ export function ModulePage({ entity }: ModulePageProps) {
   /** Handle document generation */
   async function handleDocument(row: EntityRecord) {
     try {
-      const result = await api.document(entity, row)
+      const kindMap: Record<string, string> = {
+        students: "admit_card",
+        attendance: "attendance_sheet",
+        duties: "duty_roster",
+        ufm: "ufm_report",
+      }
+      const kind = kindMap[entity] || entity
+      const result = await api.document(kind, row)
       toast({
         title: "Document Ready",
         description: (

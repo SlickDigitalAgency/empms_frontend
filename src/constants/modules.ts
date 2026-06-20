@@ -26,6 +26,11 @@ export const statusOptions: Option[] = [
   { label: "Inactive", value: "Inactive" },
 ]
 
+const getExamLabel = (row: any, refs: any) => {
+  const paper = refs.papers?.find((p: any) => String(p.id) === String(row.paper_id))
+  return `${paper?.paper_name ?? "Unknown Paper"} - ${row.exam_type ?? "Unknown Type"}`
+}
+
 export const examSystemOptions: Option[] = [
   { label: "Annual", value: "Annual" },
   { label: "Semester", value: "Semester" },
@@ -228,11 +233,11 @@ export const modules: ModuleDefinition[] = [
     }),
     fields: [
       { name: "student_id", label: "Student", type: "select", optionsFrom: "students", optionLabel: "student_name", required: true },
-      { name: "exam_id", label: "Exam", type: "select", optionsFrom: "exams", optionLabel: "exam_date", required: true },
+      { name: "exam_id", label: "Exam", type: "select", optionsFrom: "exams", optionLabel: getExamLabel, required: true },
     ],
     columns: [
       { key: "student_id", label: "Student", relation: "students", relationLabel: "student_name" },
-      { key: "exam_id", label: "Exam", relation: "exams", relationLabel: "exam_date" },
+      { key: "exam_id", label: "Exam", relation: "exams", relationLabel: getExamLabel },
     ],
   },
   {
@@ -276,7 +281,7 @@ export const modules: ModuleDefinition[] = [
       shift: required("Shift"),
     }),
     fields: [
-      { name: "exam_id", label: "Exam", type: "select", optionsFrom: "exams", optionLabel: "exam_date", required: true },
+      { name: "exam_id", label: "Exam", type: "select", optionsFrom: "exams", optionLabel: getExamLabel, required: true },
       { name: "staff_name", label: "Staff Name", type: "text", required: true },
       { name: "room_id", label: "Room", type: "select", optionsFrom: "rooms", optionLabel: "room_number", required: true },
       { name: "date", label: "Date", type: "date", required: true },
@@ -302,12 +307,12 @@ export const modules: ModuleDefinition[] = [
       attendance_status: required("Attendance status"),
     }),
     fields: [
-      { name: "exam_id", label: "Exam", type: "select", optionsFrom: "exams", optionLabel: "exam_date", required: true },
+      { name: "exam_id", label: "Exam", type: "select", optionsFrom: "exams", optionLabel: getExamLabel, required: true },
       { name: "student_id", label: "Student", type: "select", optionsFrom: "students", optionLabel: "student_name", required: true },
       { name: "attendance_status", label: "Status", type: "select", options: attendanceOptions, required: true },
     ],
     columns: [
-      { key: "exam_id", label: "Exam", relation: "exams", relationLabel: "exam_date" },
+      { key: "exam_id", label: "Exam", relation: "exams", relationLabel: getExamLabel },
       { key: "student_id", label: "Student", relation: "students", relationLabel: "student_name" },
       { key: "attendance_status", label: "Status", badge: true },
     ],
@@ -329,7 +334,7 @@ export const modules: ModuleDefinition[] = [
     }),
     fields: [
       { name: "student_id", label: "Student", type: "select", optionsFrom: "students", optionLabel: "student_name", required: true },
-      { name: "exam_id", label: "Exam", type: "select", optionsFrom: "exams", optionLabel: "exam_date", required: true },
+      { name: "exam_id", label: "Exam", type: "select", optionsFrom: "exams", optionLabel: getExamLabel, required: true },
       { name: "paper_id", label: "Paper", type: "select", optionsFrom: "papers", optionLabel: "paper_name", required: true },
       { name: "description", label: "Case Details", type: "textarea", required: true, grid: "full" },
       { name: "decision", label: "Decision", type: "textarea", grid: "full" },

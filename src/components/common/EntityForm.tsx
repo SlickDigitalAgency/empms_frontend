@@ -33,10 +33,18 @@ type EntityFormProps = {
 function fieldOptions(field: FieldConfig, references: ReferenceState): Option[] {
   if (field.options) return field.options
   if (!field.optionsFrom) return []
-  return (references[field.optionsFrom] ?? []).map((row) => ({
-    value: String(row.id ?? ""),
-    label: String(row[field.optionLabel ?? "id"] ?? row.id ?? "Untitled"),
-  }))
+  return (references[field.optionsFrom] ?? []).map((row) => {
+    let label = ""
+    if (typeof field.optionLabel === "function") {
+      label = field.optionLabel(row, references)
+    } else {
+      label = String(row[field.optionLabel ?? "id"] ?? row.id ?? "Untitled")
+    }
+    return {
+      value: String(row.id ?? ""),
+      label,
+    }
+  })
 }
 
 function inputType(field: FieldConfig) {
