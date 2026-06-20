@@ -25,7 +25,7 @@ import {
 import { Skeleton } from "@/components/ui/skeleton"
 import type { EntityRecord } from "@/types"
 
-export function SeatingPage() {
+export function GeneratePlan() {
   const { toast } = useToast()
 
   // Reference data

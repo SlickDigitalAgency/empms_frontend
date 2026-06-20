@@ -95,4 +95,12 @@ export const api = {
     apiRequest<{ created: number; roomsUsed: number }>("seating", "POST", { exam_id: examId, room_ids: roomIds }, { action: "generate" }),
   document: (kind: string, payload: EntityRecord) =>
     apiRequest<{ url: string }>("documents", "POST", { kind, ...payload }),
+  getSeatingPlansSummary: () =>
+    apiRequest<any[]>("seating", "GET", undefined, { action: "seating-plans" }),
+  getSeatingPlanDetails: (examId: string) =>
+    apiRequest<EntityRecord[]>("seating", "GET", undefined, { action: "seating-plan-details", exam_id: examId }),
+  getStudentSeating: (studentId: string) =>
+    apiRequest<EntityRecord[]>("seating", "GET", undefined, { action: "student-seating", student_id: studentId }),
+  getRoomSeating: (roomId: string, examId?: string) =>
+    apiRequest<EntityRecord[]>("seating", "GET", undefined, { action: "room-seating", room_id: roomId, ...(examId ? { exam_id: examId } : {}) }),
 }

@@ -8,6 +8,14 @@ import { ModulePage } from "@/pages/ModulePage"
 import { SeatingPage } from "@/pages/SeatingPage"
 import { ReportsPage } from "@/pages/ReportsPage"
 import { SettingsPage } from "@/pages/SettingsPage"
+import { SeatingLayout } from "@/pages/seating/SeatingLayout"
+import { SeatingDashboard } from "@/pages/seating/SeatingDashboard"
+import { SeatingPlans } from "@/pages/seating/SeatingPlans"
+import { SeatingDetails } from "@/pages/seating/SeatingDetails"
+import { StudentSlip } from "@/pages/seating/StudentSlip"
+import { RoomPlan } from "@/pages/seating/RoomPlan"
+import { SeatingReports } from "@/pages/seating/SeatingReports"
+import { GeneratePlan } from "@/pages/seating/GeneratePlan"
 import type { EntityName } from "@/types"
 
 /** Redirects unauthenticated users to /login */
@@ -56,7 +64,17 @@ export default function App() {
                     <Route path="/exams" element={<EntityPage entity="exams" />} />
                     <Route path="/registration" element={<EntityPage entity="registration" />} />
                     <Route path="/rooms" element={<EntityPage entity="rooms" />} />
-                    <Route path="/seating" element={<SeatingPage />} />
+                    <Route path="/seating/*" element={
+                      <SeatingLayout />
+                    }>
+                      <Route index element={<SeatingDashboard />} />
+                      <Route path="plans" element={<SeatingPlans />} />
+                      <Route path="plans/:examId" element={<SeatingDetails />} />
+                      <Route path="student-slip" element={<StudentSlip />} />
+                      <Route path="room-plan" element={<RoomPlan />} />
+                      <Route path="reports" element={<SeatingReports />} />
+                      <Route path="generate" element={<GeneratePlan />} />
+                    </Route>
                     <Route path="/duties" element={<EntityPage entity="duties" />} />
                     <Route path="/attendance" element={<EntityPage entity="attendance" />} />
                     <Route path="/ufm" element={<EntityPage entity="ufm" />} />
