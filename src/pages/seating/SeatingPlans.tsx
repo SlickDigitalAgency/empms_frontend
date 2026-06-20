@@ -25,6 +25,7 @@ export function SeatingPlans() {
   const [plans, setPlans] = useState<any[]>([])
   const [exams, setExams] = useState<EntityRecord[]>([])
   const [papers, setPapers] = useState<EntityRecord[]>([])
+  const [programs, setPrograms] = useState<EntityRecord[]>([])
 
   useEffect(() => {
     loadData()
@@ -33,14 +34,16 @@ export function SeatingPlans() {
   async function loadData() {
     setLoading(true)
     try {
-      const [plansData, examsData, papersData] = await Promise.all([
+      const [plansData, examsData, papersData, programsData] = await Promise.all([
         api.getSeatingPlansSummary(),
         api.list("exams"),
-        api.list("papers")
+        api.list("papers"),
+        api.list("programs")
       ])
       setPlans(plansData || [])
       setExams(examsData || [])
       setPapers(papersData || [])
+      setPrograms(programsData || [])
     } catch (err) {
       toast({ variant: "destructive", title: "Error", description: "Failed to load seating plans." })
     } finally {
@@ -100,7 +103,8 @@ export function SeatingPlans() {
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>Exam ID</TableHead>
+                    <TableHead>Program</TableHead>
+                    <TableHead>Exam Name</TableHead>
                     <TableHead>Paper</TableHead>
                     <TableHead>Date</TableHead>
                     <TableHead>Students</TableHead>
@@ -111,9 +115,13 @@ export function SeatingPlans() {
                 <TableBody>
                   {plans.map((plan) => {
                     const details = getExamDetails(plan.exam_id)
+                    const programObj = programs.find(p => String(p.id) === String(details?.program_id))
+                    const programName = programObj ? String(programObj.program_name) : "Unknown Program"
+                      
                     return (
                       <TableRow key={plan.exam_id}>
-                        <TableCell className="font-medium">{plan.exam_id}</TableCell>
+                        <TableCell className="font-medium text-muted-foreground">{programName}</TableCell>
+                        <TableCell className="font-medium">{details?.exam_type || "Unknown Exam"}</TableCell>
                         <TableCell>{details?.paper_name || "Unknown Paper"}</TableCell>
                         <TableCell>{String(details?.exam_date || "N/A")}</TableCell>
                         <TableCell>{plan.total_students}</TableCell>

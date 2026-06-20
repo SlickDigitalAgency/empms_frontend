@@ -246,22 +246,39 @@ export const modules: ModuleDefinition[] = [
     singular: "Room",
     route: "/rooms",
     icon: Building2,
-    description: "Track examination rooms, buildings, capacity, and availability.",
+    description: "Track examination rooms, layout, capacity, and availability.",
     schema: z.object({
       room_number: required("Room number"),
       building: required("Building"),
+      rows: numberText("Rows"),
+      columns: numberText("Columns"),
       capacity: numberText("Capacity"),
       status: required("Status"),
+    }).refine(data => {
+      const r = Number(data.rows) || 0
+      const c = Number(data.columns) || 0
+      const cap = Number(data.capacity) || 0
+      if (r > 0 && c > 0 && (r * c !== cap)) {
+        return false
+      }
+      return true
+    }, {
+      message: "Rows × Columns must equal Capacity",
+      path: ["capacity"]
     }),
     fields: [
       { name: "room_number", label: "Room Number", type: "text", required: true },
       { name: "building", label: "Building", type: "text", required: true },
+      { name: "rows", label: "Rows", type: "number", required: true },
+      { name: "columns", label: "Columns", type: "number", required: true },
       { name: "capacity", label: "Capacity", type: "number", required: true },
       { name: "status", label: "Status", type: "select", options: [{ label: "Available", value: "Available" }, { label: "Unavailable", value: "Unavailable" }], required: true },
     ],
     columns: [
       { key: "room_number", label: "Room", sortable: true },
       { key: "building", label: "Building", sortable: true },
+      { key: "rows", label: "Rows" },
+      { key: "columns", label: "Columns" },
       { key: "capacity", label: "Capacity", sortable: true },
       { key: "status", label: "Status", badge: true },
     ],

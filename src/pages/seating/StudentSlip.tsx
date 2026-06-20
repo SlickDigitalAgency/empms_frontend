@@ -211,7 +211,9 @@ export function StudentSlip() {
                     <th className="py-2 px-3 text-xs font-bold uppercase">Date & Time</th>
                     <th className="py-2 px-3 text-xs font-bold uppercase">Paper</th>
                     <th className="py-2 px-3 text-xs font-bold uppercase">Room & Bldg</th>
-                    <th className="py-2 px-3 text-xs font-bold uppercase">Seat No</th>
+                    <th className="py-2 px-3 text-xs font-bold uppercase">Row</th>
+                    <th className="py-2 px-3 text-xs font-bold uppercase">Col</th>
+                    <th className="py-2 px-3 text-xs font-bold uppercase">Seat</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -229,7 +231,13 @@ export function StudentSlip() {
                         </td>
                         <td className="py-3 px-3 text-sm text-black">
                           <span className="font-bold">Room {String(room?.room_number || "N/A")}</span>
-                          <span className="block text-xs text-gray-600">{String(room?.building || "N/A")}</span>
+                          <span className="block text-xs text-gray-600">{String(row.building || room?.building || "N/A")}</span>
+                        </td>
+                        <td className="py-3 px-3 text-sm font-bold text-black">
+                          {row.row_number || "-"}
+                        </td>
+                        <td className="py-3 px-3 text-sm font-bold text-black">
+                          {row.column_number || "-"}
                         </td>
                         <td className="py-3 px-3">
                           <span className="inline-block px-3 py-1 bg-black text-white font-bold rounded text-lg">

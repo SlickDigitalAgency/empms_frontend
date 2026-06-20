@@ -23,7 +23,8 @@ export function SeatingDetails() {
     papers: EntityRecord[]
     rooms: EntityRecord[]
     students: EntityRecord[]
-  }>({ exams: [], papers: [], rooms: [], students: [] })
+    programs: EntityRecord[]
+  }>({ exams: [], papers: [], rooms: [], students: [], programs: [] })
 
   useEffect(() => {
     if (!examId) return
@@ -33,15 +34,16 @@ export function SeatingDetails() {
   async function loadData() {
     setLoading(true)
     try {
-      const [seating, exams, papers, rooms, students] = await Promise.all([
+      const [seating, exams, papers, rooms, students, programs] = await Promise.all([
         api.getSeatingPlanDetails(examId!),
         api.list("exams"),
         api.list("papers"),
         api.list("rooms"),
         api.list("students"),
+        api.list("programs"),
       ])
       setSeatingData(seating || [])
-      setRefs({ exams, papers, rooms, students })
+      setRefs({ exams, papers, rooms, students, programs })
     } catch (err) {
       toast({ variant: "destructive", title: "Error", description: "Failed to load seating details." })
     } finally {
@@ -62,9 +64,14 @@ export function SeatingDetails() {
       totalSeats++
     })
 
-    // Sort rooms by room number/id and seats
     Object.keys(grouped).forEach(roomId => {
-      grouped[roomId].sort((a, b) => Number(a.seat_number) - Number(b.seat_number))
+      grouped[roomId].sort((a, b) => {
+        // First try to sort numerically if it's a number, otherwise just alphabetically
+        const aNum = Number(a.seat_number)
+        const bNum = Number(b.seat_number)
+        if (!isNaN(aNum) && !isNaN(bNum)) return aNum - bNum
+        return String(a.seat_number).localeCompare(String(b.seat_number))
+      })
     })
 
     return { exam, paper, roomsGrouped: grouped, totalSeats }
@@ -85,26 +92,41 @@ export function SeatingDetails() {
     return r ? `Room ${r.room_number} (${r.building})` : `Room ${roomId}`
   }
 
+  function getStudentProgram(studentId: string) {
+    const s = refs.students.find((st) => String(st.id) === String(studentId) || String(st.student_id) === String(studentId))
+    const pId = s?.program_id
+    if (!pId) return "Unknown"
+    const prog = refs.programs.find(p => String(p.id) === String(pId))
+    return prog ? String(prog.program_name) : String(pId)
+  }
+
   function handleExportExcel() {
     if (seatingData.length === 0) return
     const exportData = seatingData.map(row => ({
-      "Exam ID": row.exam_id,
-      "Room": getRoomName(row.room_id),
-      "Seat No": row.seat_number,
       "Roll No": getStudentRoll(row.student_id),
-      "Student Name": getStudentName(row.student_id)
+      "Student Name": getStudentName(row.student_id),
+      "Program": getStudentProgram(row.student_id),
+      "Exam": String(paper?.paper_name || "N/A"),
+      "Date": String(exam?.exam_date || "N/A"),
+      "Room": getRoomName(row.room_id),
+      "Row": row.row_number || "",
+      "Column": row.column_number || "",
+      "Seat No": row.seat_number
     }))
     excelService.exportToExcel(exportData, `Seating_Plan_Exam_${examId}`)
   }
 
   function handleExportPdf() {
     if (seatingData.length === 0) return
-    const columns = ["Room", "Seat No", "Roll No", "Student Name"]
+    const columns = ["Roll No", "Student Name", "Program", "Room", "Row", "Col", "Seat No"]
     const data = seatingData.map(row => [
-      getRoomName(row.room_id),
-      String(row.seat_number),
       String(getStudentRoll(row.student_id)),
-      getStudentName(row.student_id)
+      getStudentName(row.student_id),
+      getStudentProgram(row.student_id),
+      getRoomName(row.room_id),
+      String(row.row_number || ""),
+      String(row.column_number || ""),
+      String(row.seat_number)
     ])
     
     const title = `Seating Plan - ${paper?.paper_name || "Unknown"} (${exam?.exam_date || ""})`
@@ -196,17 +218,27 @@ export function SeatingDetails() {
                       <table className="w-full text-sm">
                         <thead className="bg-muted/50 text-muted-foreground">
                           <tr>
-                            <th className="py-2 px-4 text-left font-medium">Seat</th>
                             <th className="py-2 px-4 text-left font-medium">Roll No</th>
                             <th className="py-2 px-4 text-left font-medium">Student Name</th>
+                            <th className="py-2 px-4 text-left font-medium">Program</th>
+                            <th className="py-2 px-4 text-left font-medium">Row</th>
+                            <th className="py-2 px-4 text-left font-medium">Col</th>
+                            <th className="py-2 px-4 text-left font-medium">Seat</th>
                           </tr>
                         </thead>
                         <tbody className="divide-y">
                           {rows.map((row) => (
                             <tr key={`${row.room_id}-${row.seat_number}`} className="hover:bg-muted/30">
-                              <td className="py-2 px-4 w-20">#{row.seat_number}</td>
-                              <td className="py-2 px-4 font-mono">{getStudentRoll(row.student_id)}</td>
+                              <td className="py-2 px-4 font-mono font-medium">{getStudentRoll(row.student_id)}</td>
                               <td className="py-2 px-4">{getStudentName(row.student_id)}</td>
+                              <td className="py-2 px-4 text-muted-foreground">{getStudentProgram(row.student_id)}</td>
+                              <td className="py-2 px-4">{row.row_number || "-"}</td>
+                              <td className="py-2 px-4">{row.column_number || "-"}</td>
+                              <td className="py-2 px-4">
+                                <span className="inline-flex items-center rounded-md bg-primary/10 px-2 py-1 text-xs font-medium text-primary ring-1 ring-inset ring-primary/20">
+                                  {row.seat_number}
+                                </span>
+                              </td>
                             </tr>
                           ))}
                         </tbody>
